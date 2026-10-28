@@ -234,8 +234,8 @@ int main(int argc, char* argv[]) {
         std::printf("[경고] Job Object 메모리 제한 설정에 실패했거나 이미 상위 Job에 속해 있습니다.\n");
     }
 
-    FastSOSDIndex<uint64_t> index;
-    std::vector<uint64_t> synthetic_data; // 파일이 없을 때 사용할 인메모리 테스트 배열
+    FastSOSDIndex<uint32_t> index;
+    std::vector<uint32_t> synthetic_data; // 파일이 없을 때 사용할 인메모리 테스트 배열
 
     // 명령줄 인자로 SOSD 데이터셋 파일 경로가 주어진 경우 (예: program.exe books_200M_uint64)
     const char* dataset_path = (argc > 1) ? argv[1] : nullptr;
