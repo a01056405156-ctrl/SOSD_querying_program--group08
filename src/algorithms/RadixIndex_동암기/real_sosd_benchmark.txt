@@ -1,0 +1,13 @@
+﻿Dataset: uniform_dense_200M_uint32
+Keys: 200000000
+Index build: 348.107 ms
+Queries: 2000000
+Hits: 1000000
+Misses: 1000000
+Search: 274.360 ms
+Average: 137.18 ns/query
+Total: 622.467 ms
+Private memory: 2.75 MiB
+Working set: 768.31 MiB
+Validation errors: 0
+Benchmark validation: PASS
