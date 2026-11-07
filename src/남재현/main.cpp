@@ -1,4 +1,4 @@
-#define NOMINMAX // Windows.hÀÇ min/max ¸ÅÅ©·Î Ãæµ¹ ¹æÁö
+#define NOMINMAX // Windows.hì˜ min/max ë§¤í¬ë¡œ ì¶©ëŒ ë°©ì§€
 #include <windows.h>
 #include <psapi.h>
 #include <cstdint>
@@ -11,18 +11,18 @@
 #include <random>
 #include <intrin.h>
 
-// °Ë»ö ½ÇÆĞ ½Ã ¹İÈ¯ÇÒ »ó¼ö
+// ê²€ìƒ‰ ì‹¤íŒ¨ ì‹œ ë°˜í™˜í•  ìƒìˆ˜
 constexpr int64_t NOT_FOUND = -1;
 
 // ============================================================================
-// 1. Windows Job Object¸¦ ÀÌ¿ëÇÑ 512MB ¸Ş¸ğ¸® Á¦ÇÑ ¼³Á¤ ÇÔ¼ö
+// 1. Windows Job Objectë¥¼ ì´ìš©í•œ 512MB ë©”ëª¨ë¦¬ ì œí•œ ì„¤ì • í•¨ìˆ˜
 // ============================================================================
 bool EnforceMemoryLimit512MB() {
     HANDLE hJob = CreateJobObjectA(NULL, NULL);
     if (!hJob) return false;
 
     JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli = { 0 };
-    // ÇÁ·Î¼¼½ºÀÇ Private Commit ¸Ş¸ğ¸® ÇÑµµ¸¦ Á¤È®È÷ 512MB·Î Á¦ÇÑ
+    // í”„ë¡œì„¸ìŠ¤ì˜ Private Commit ë©”ëª¨ë¦¬ í•œë„ë¥¼ ì •í™•íˆ 512MBë¡œ ì œí•œ
     jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_PROCESS_MEMORY;
     jeli.ProcessMemoryLimit = 512ULL * 1024ULL * 1024ULL; // 512 MB
 
@@ -31,31 +31,31 @@ bool EnforceMemoryLimit512MB() {
         return false;
     }
 
-    // ÇöÀç ½ÇÇà ÁßÀÎ ÇÁ·Î¼¼½º¸¦ Job Object¿¡ ÇÒ´ç
+    // í˜„ì¬ ì‹¤í–‰ ì¤‘ì¸ í”„ë¡œì„¸ìŠ¤ë¥¼ Job Objectì— í• ë‹¹
     if (!AssignProcessToJobObject(hJob, GetCurrentProcess())) {
-        // ÁÖÀÇ: Visual Studio µğ¹ö°Å µî »óÀ§ ÇÁ·Î¼¼½º°¡ ÀÌ¹Ì Job¿¡ ¹­¿© ÀÖ´Â ±¸Çü È¯°æ¿¡¼­´Â
-        // ÁßÃ¸ JobÀÌ ½ÇÆĞÇÒ ¼ö ÀÖÀ¸³ª Windows 10/11¿¡¼­´Â Á¤»ó µ¿ÀÛÇÕ´Ï´Ù.
+        // ì£¼ì˜: Visual Studio ë””ë²„ê±° ë“± ìƒìœ„ í”„ë¡œì„¸ìŠ¤ê°€ ì´ë¯¸ Jobì— ë¬¶ì—¬ ìˆëŠ” êµ¬í˜• í™˜ê²½ì—ì„œëŠ”
+        // ì¤‘ì²© Jobì´ ì‹¤íŒ¨í•  ìˆ˜ ìˆìœ¼ë‚˜ Windows 10/11ì—ì„œëŠ” ì •ìƒ ë™ì‘í•©ë‹ˆë‹¤.
         CloseHandle(hJob);
         return false;
     }
 
-    // ÇÁ·Î¼¼½º Á¾·á ½Ã±îÁö À¯Áö¸¦ À§ÇØ ÇÚµéÀ» ´İÁö ¾Ê°Å³ª Á¤ÀûÀ¸·Î À¯Áö
+    // í”„ë¡œì„¸ìŠ¤ ì¢…ë£Œ ì‹œê¹Œì§€ ìœ ì§€ë¥¼ ìœ„í•´ í•¸ë“¤ì„ ë‹«ì§€ ì•Šê±°ë‚˜ ì •ì ìœ¼ë¡œ ìœ ì§€
     return true;
 }
 
-// ÇöÀç ÇÁ·Î¼¼½ºÀÇ ¸Ş¸ğ¸® »ç¿ë·®(Private Commit) Ãâ·Â À¯Æ¿¸®Æ¼
+// í˜„ì¬ í”„ë¡œì„¸ìŠ¤ì˜ ë©”ëª¨ë¦¬ ì‚¬ìš©ëŸ‰(Private Commit) ì¶œë ¥ ìœ í‹¸ë¦¬í‹°
 void PrintMemoryUsage() {
     PROCESS_MEMORY_COUNTERS_EX pmc;
     if (GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc))) {
         double private_mb = static_cast<double>(pmc.PrivateUsage) / (1024.0 * 1024.0);
         double working_mb = static_cast<double>(pmc.WorkingSetSize) / (1024.0 * 1024.0);
-        std::printf("[¸Ş¸ğ¸® »óÅÂ] Private Commit: %.2f MB / 512.00 MB (Working Set: %.2f MB)\n",
+        std::printf("[ë©”ëª¨ë¦¬ ìƒíƒœ] Private Commit: %.2f MB / 512.00 MB (Working Set: %.2f MB)\n",
             private_mb, working_mb);
     }
 }
 
 // ============================================================================
-// 2. 3°èÃş ÃÊ°í¼Ó SOSD ÀÎ¸Ş¸ğ¸® ÀÎµ¦½º (Radix + Interpolation + Branchless)
+// 2. 3ê³„ì¸µ ì´ˆê³ ì† SOSD ì¸ë©”ëª¨ë¦¬ ì¸ë±ìŠ¤ (Radix + Interpolation + Branchless)
 // ============================================================================
 template <typename KeyType = uint64_t>
 class FastSOSDIndex {
@@ -65,7 +65,7 @@ private:
     KeyType min_key_ = 0;
     KeyType max_key_ = 0;
 
-    // 22ºñÆ® Radix Å×ÀÌºí = 4,194,304 ¿£Æ®¸® = Á¤È®È÷ 16MB ¼Ò¸ğ
+    // 22ë¹„íŠ¸ Radix í…Œì´ë¸” = 4,194,304 ì—”íŠ¸ë¦¬ = ì •í™•íˆ 16MB ì†Œëª¨
     static constexpr uint32_t RADIX_BITS = 22;
     static constexpr uint32_t RADIX_SIZE = 1U << RADIX_BITS;
     uint32_t shift_bits_ = 0;
@@ -84,7 +84,7 @@ public:
         if (hFile_ != INVALID_HANDLE_VALUE) CloseHandle(hFile_);
     }
 
-    // SOSD Ç¥ÁØ ¹ÙÀÌ³Ê¸® ÆÄÀÏ ¸ÅÇÎ ¹× ÀÎµ¦½º ºôµå
+    // SOSD í‘œì¤€ ë°”ì´ë„ˆë¦¬ íŒŒì¼ ë§¤í•‘ ë° ì¸ë±ìŠ¤ ë¹Œë“œ
     bool LoadAndBuildFromFile(const char* filepath) {
         hFile_ = CreateFileA(filepath, GENERIC_READ, FILE_SHARE_READ, NULL,
             OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS, NULL);
@@ -96,7 +96,7 @@ public:
         mapped_view_ = MapViewOfFile(hMap_, FILE_MAP_READ, 0, 0, 0);
         if (!mapped_view_) return false;
 
-        // SOSD ¹ÙÀÌ³Ê¸® ÆÄÀÏ ±Ô°İ: Ã¹ 8¹ÙÀÌÆ® = ¿ø¼Ò °³¼ö(uint64_t), ±× µÚ·Î ¿ø¼Ò ¹è¿­
+        // SOSD ë°”ì´ë„ˆë¦¬ íŒŒì¼ ê·œê²©: ì²« 8ë°”ì´íŠ¸ = ì›ì†Œ ê°œìˆ˜(uint64_t), ê·¸ ë’¤ë¡œ ì›ì†Œ ë°°ì—´
         uint64_t count = *reinterpret_cast<const uint64_t*>(mapped_view_);
         const KeyType* raw_keys = reinterpret_cast<const KeyType*>(
             static_cast<const char*>(mapped_view_) + sizeof(uint64_t)
@@ -106,7 +106,7 @@ public:
         return true;
     }
 
-    // ¸Ş¸ğ¸®¿¡ ¿Ã¶ó¿Â Á¤·Ä ¹è¿­·ÎºÎÅÍ ÀÎµ¦½º ºôµå
+    // ë©”ëª¨ë¦¬ì— ì˜¬ë¼ì˜¨ ì •ë ¬ ë°°ì—´ë¡œë¶€í„° ì¸ë±ìŠ¤ ë¹Œë“œ
     void BuildFromArray(const KeyType* sorted_keys, uint32_t count) {
         data_ = sorted_keys;
         num_keys_ = count;
@@ -152,7 +152,7 @@ public:
         radix_table_[RADIX_SIZE] = count;
     }
 
-    // Å° °Ë»ö ÇÔ¼ö (Á¸ÀçÇÏ¸é ÀÎµ¦½º À§Ä¡ 0 ~ N-1 ¹İÈ¯, ¾øÀ¸¸é -1 ¹İÈ¯)
+    // í‚¤ ê²€ìƒ‰ í•¨ìˆ˜ (ì¡´ì¬í•˜ë©´ ì¸ë±ìŠ¤ ìœ„ì¹˜ 0 ~ N-1 ë°˜í™˜, ì—†ìœ¼ë©´ -1 ë°˜í™˜)
     __forceinline int64_t Search(KeyType key) const {
         if (key < min_key_ || key > max_key_) [[unlikely]] {
             return NOT_FOUND;
@@ -219,35 +219,35 @@ private:
 };
 
 // ============================================================================
-// 3. Main ÇÔ¼ö: ¸Ş¸ğ¸® Á¦ÇÑ Àû¿ë -> ºôµå ÃøÁ¤ -> Äõ¸® ÃøÁ¤ -> ´ëÈ­Çü °Ë»ö
+// 3. Main í•¨ìˆ˜: ë©”ëª¨ë¦¬ ì œí•œ ì ìš© -> ë¹Œë“œ ì¸¡ì • -> ì¿¼ë¦¬ ì¸¡ì • -> ëŒ€í™”í˜• ê²€ìƒ‰
 // ============================================================================
 int main(int argc, char* argv[]) {
-    // ÀÔÃâ·Â ¼Óµµ Çâ»ó
+    // ì…ì¶œë ¥ ì†ë„ í–¥ìƒ
     std::ios_base::sync_with_stdio(false);
     std::cin.tie(nullptr);
 
-    // 1. 512MB ¸Ş¸ğ¸® Á¦¾à ¼³Á¤ (Windows Job Object)
+    // 1. 512MB ë©”ëª¨ë¦¬ ì œì•½ ì„¤ì • (Windows Job Object)
     if (EnforceMemoryLimit512MB()) {
-        std::printf("[½Ã½ºÅÛ] Windows Job Object 512MB ¸Ş¸ğ¸® Á¦ÇÑÀÌ È°¼ºÈ­µÇ¾ú½À´Ï´Ù.\n");
+        std::printf("[ì‹œìŠ¤í…œ] Windows Job Object 512MB ë©”ëª¨ë¦¬ ì œí•œì´ í™œì„±í™”ë˜ì—ˆìŠµë‹ˆë‹¤.\n");
     }
     else {
-        std::printf("[°æ°í] Job Object ¸Ş¸ğ¸® Á¦ÇÑ ¼³Á¤¿¡ ½ÇÆĞÇß°Å³ª ÀÌ¹Ì »óÀ§ Job¿¡ ¼ÓÇØ ÀÖ½À´Ï´Ù.\n");
+        std::printf("[ê²½ê³ ] Job Object ë©”ëª¨ë¦¬ ì œí•œ ì„¤ì •ì— ì‹¤íŒ¨í–ˆê±°ë‚˜ ì´ë¯¸ ìƒìœ„ Jobì— ì†í•´ ìˆìŠµë‹ˆë‹¤.\n");
     }
 
     FastSOSDIndex<uint32_t> index;
-    std::vector<uint32_t> synthetic_data; // ÆÄÀÏÀÌ ¾øÀ» ¶§ »ç¿ëÇÒ ÀÎ¸Ş¸ğ¸® Å×½ºÆ® ¹è¿­
+    std::vector<uint32_t> synthetic_data; // íŒŒì¼ì´ ì—†ì„ ë•Œ ì‚¬ìš©í•  ì¸ë©”ëª¨ë¦¬ í…ŒìŠ¤íŠ¸ ë°°ì—´
 
-    // ¸í·ÉÁÙ ÀÎÀÚ·Î SOSD µ¥ÀÌÅÍ¼Â ÆÄÀÏ °æ·Î°¡ ÁÖ¾îÁø °æ¿ì (¿¹: program.exe books_200M_uint64)
+    // ëª…ë ¹ì¤„ ì¸ìë¡œ SOSD ë°ì´í„°ì…‹ íŒŒì¼ ê²½ë¡œê°€ ì£¼ì–´ì§„ ê²½ìš° (ì˜ˆ: program.exe books_200M_uint64)
     const char* dataset_path = (argc > 1) ? argv[1] : nullptr;
 
     double build_time_ms = 0.0;
 
     if (dataset_path != nullptr) {
-        std::printf("[µ¥ÀÌÅÍ ·Îµå] SOSD ÆÄÀÏ ¸ÅÇÎ ¹× ÀÎµ¦½º ºôµå ½ÃÀÛ: %s\n", dataset_path);
+        std::printf("[ë°ì´í„° ë¡œë“œ] SOSD íŒŒì¼ ë§¤í•‘ ë° ì¸ë±ìŠ¤ ë¹Œë“œ ì‹œì‘: %s\n", dataset_path);
         auto start_build = std::chrono::high_resolution_clock::now();
 
         if (!index.LoadAndBuildFromFile(dataset_path)) {
-            std::printf("[¿À·ù] ÆÄÀÏÀ» ¿­ ¼ö ¾ø½À´Ï´Ù: %s\n", dataset_path);
+            std::printf("[ì˜¤ë¥˜] íŒŒì¼ì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤: %s\n", dataset_path);
             return 1;
         }
 
@@ -255,23 +255,23 @@ int main(int argc, char* argv[]) {
         build_time_ms = std::chrono::duration<double, std::milli>(end_build - start_build).count();
     }
     else {
-        // ÆÄÀÏ °æ·Î°¡ ¾øÀ¸¸é Å×½ºÆ®¸¦ À§ÇØ 5,000¸¸ °³(¾à 400MB)ÀÇ Á¤·ÄµÈ 64ºñÆ® Á¤¼ö µ¥ÀÌÅÍ¸¦ »ı¼º
-        // (512MB Á¦ÇÑ ³»¿¡ ¿øº» ¹è¿­ 400MB + Radix ÀÎµ¦½º 16MB = ÃÑ 416MB·Î ¾ÈÀüÇÏ°Ô µé¾î°¨)
+        // íŒŒì¼ ê²½ë¡œê°€ ì—†ìœ¼ë©´ í…ŒìŠ¤íŠ¸ë¥¼ ìœ„í•´ 5,000ë§Œ ê°œ(ì•½ 400MB)ì˜ ì •ë ¬ëœ 64ë¹„íŠ¸ ì •ìˆ˜ ë°ì´í„°ë¥¼ ìƒì„±
+        // (512MB ì œí•œ ë‚´ì— ì›ë³¸ ë°°ì—´ 400MB + Radix ì¸ë±ìŠ¤ 16MB = ì´ 416MBë¡œ ì•ˆì „í•˜ê²Œ ë“¤ì–´ê°)
         const uint32_t NUM_TEST_KEYS = 50'000'000;
-        std::printf("[Å×½ºÆ® ¸ğµå] ÆÄÀÏ ÀÎÀÚ°¡ ¾ø¾î %u°³(¾à 381MB)ÀÇ °¡»ó Á¤·Ä µ¥ÀÌÅÍ¼ÂÀ» »ı¼ºÇÕ´Ï´Ù...\n", NUM_TEST_KEYS);
+        std::printf("[í…ŒìŠ¤íŠ¸ ëª¨ë“œ] íŒŒì¼ ì¸ìê°€ ì—†ì–´ %uê°œ(ì•½ 381MB)ì˜ ê°€ìƒ ì •ë ¬ ë°ì´í„°ì…‹ì„ ìƒì„±í•©ë‹ˆë‹¤...\n", NUM_TEST_KEYS);
 
         synthetic_data.resize(NUM_TEST_KEYS);
         uint64_t cur = 100;
         for (uint32_t i = 0; i < NUM_TEST_KEYS; ++i) {
-            // Â¦¼ö/È¦¼ö °£°İÀ» ¼¯¾î Á¸ÀçÇÏ´Â Å°¿Í Á¸ÀçÇÏÁö ¾Ê´Â ºóÆ´(Gap)À» »ı¼º
+            // ì§ìˆ˜/í™€ìˆ˜ ê°„ê²©ì„ ì„ì–´ ì¡´ì¬í•˜ëŠ” í‚¤ì™€ ì¡´ì¬í•˜ì§€ ì•ŠëŠ” ë¹ˆí‹ˆ(Gap)ì„ ìƒì„±
             cur += (i % 3 == 0) ? 5 : 2;
             synthetic_data[i] = cur;
         }
 
         PrintMemoryUsage();
-        std::printf("[ºôµå ½ÃÀÛ] ÀÎµ¦½º ±¸Ãà Áß...\n");
+        std::printf("[ë¹Œë“œ ì‹œì‘] ì¸ë±ìŠ¤ êµ¬ì¶• ì¤‘...\n");
 
-        // ¡Ú ¼ø¼ö ÀÚ·á±¸Á¶ ºôµå ½Ã°£ ÃøÁ¤ ½ÃÀÛ ¡Ú
+        // â˜… ìˆœìˆ˜ ìë£Œêµ¬ì¡° ë¹Œë“œ ì‹œê°„ ì¸¡ì • ì‹œì‘ â˜…
         auto start_build = std::chrono::high_resolution_clock::now();
         index.BuildFromArray(synthetic_data.data(), NUM_TEST_KEYS);
         auto end_build = std::chrono::high_resolution_clock::now();
@@ -279,14 +279,14 @@ int main(int argc, char* argv[]) {
         build_time_ms = std::chrono::duration<double, std::milli>(end_build - start_build).count();
     }
 
-    std::printf("[ºôµå ¿Ï·á] ÃÑ ¿ø¼Ò ¼ö: %u°³ | ºôµå ¼Ò¿ä ½Ã°£: %.3f ms\n", index.size(), build_time_ms);
+    std::printf("[ë¹Œë“œ ì™„ë£Œ] ì´ ì›ì†Œ ìˆ˜: %uê°œ | ë¹Œë“œ ì†Œìš” ì‹œê°„: %.3f ms\n", index.size(), build_time_ms);
     PrintMemoryUsage();
 
     // ========================================================================
-    // 4. º¥Ä¡¸¶Å©: Á¸ÀçÇÏ´Â µ¥ÀÌÅÍ(Hit) + Á¸ÀçÇÏÁö ¾Ê´Â µ¥ÀÌÅÍ(Miss) °Ë»ö ½Ã°£ ÃøÁ¤
+    // 4. ë²¤ì¹˜ë§ˆí¬: ì¡´ì¬í•˜ëŠ” ë°ì´í„°(Hit) + ì¡´ì¬í•˜ì§€ ì•ŠëŠ” ë°ì´í„°(Miss) ê²€ìƒ‰ ì‹œê°„ ì¸¡ì •
     // ========================================================================
     if (!synthetic_data.empty()) {
-        const size_t NUM_QUERIES = 2'000'000; // 200¸¸ °³ Äõ¸® (100¸¸ °³ Hit + 100¸¸ °³ Miss)
+        const size_t NUM_QUERIES = 2'000'000; // 200ë§Œ ê°œ ì¿¼ë¦¬ (100ë§Œ ê°œ Hit + 100ë§Œ ê°œ Miss)
         std::vector<uint64_t> queries(NUM_QUERIES);
 
         std::mt19937_64 rng(2022202090);
@@ -294,22 +294,22 @@ int main(int argc, char* argv[]) {
 
         for (size_t i = 0; i < NUM_QUERIES; ++i) {
             if (i % 2 == 0) {
-                // ½ÇÁ¦ Á¸ÀçÇÏ´Â Å° (Positive Query)
+                // ì‹¤ì œ ì¡´ì¬í•˜ëŠ” í‚¤ (Positive Query)
                 queries[i] = synthetic_data[idx_dist(rng)];
             }
             else {
-                // ½ÇÁ¦ Á¸ÀçÇÏÁö ¾Ê´Â Å° (Negative Query: Á¸ÀçÇÏ´Â Å°¿¡¼­ 1À» »©¼­ ºóÆ´ °ª »ı¼º)
+                // ì‹¤ì œ ì¡´ì¬í•˜ì§€ ì•ŠëŠ” í‚¤ (Negative Query: ì¡´ì¬í•˜ëŠ” í‚¤ì—ì„œ 1ì„ ë¹¼ì„œ ë¹ˆí‹ˆ ê°’ ìƒì„±)
                 queries[i] = synthetic_data[idx_dist(rng)] - 1;
             }
         }
 
-        std::printf("\n[º¥Ä¡¸¶Å©] ÃÑ %zu°³ Äõ¸®(Hit 50%%, Miss 50%%) °Ë»ö ½ÃÀÛ...\n", NUM_QUERIES);
+        std::printf("\n[ë²¤ì¹˜ë§ˆí¬] ì´ %zuê°œ ì¿¼ë¦¬(Hit 50%%, Miss 50%%) ê²€ìƒ‰ ì‹œì‘...\n", NUM_QUERIES);
 
         uint64_t hit_count = 0;
         uint64_t miss_count = 0;
-        int64_t checksum = 0; // ÄÄÆÄÀÏ·¯°¡ ·çÇÁ¸¦ ÃÖÀûÈ­·Î Áö¿ö¹ö¸®´Â °Í(Dead Code Elimination) ¹æÁö
+        int64_t checksum = 0; // ì»´íŒŒì¼ëŸ¬ê°€ ë£¨í”„ë¥¼ ìµœì í™”ë¡œ ì§€ì›Œë²„ë¦¬ëŠ” ê²ƒ(Dead Code Elimination) ë°©ì§€
 
-        // ¡Ú ½ÇÁ¦ °Ë»ö ½Ã°£ ÃøÁ¤ ½ÃÀÛ ¡Ú
+        // â˜… ì‹¤ì œ ê²€ìƒ‰ ì‹œê°„ ì¸¡ì • ì‹œì‘ â˜…
         auto start_search = std::chrono::high_resolution_clock::now();
 
         for (size_t i = 0; i < NUM_QUERIES; ++i) {
@@ -328,25 +328,25 @@ int main(int argc, char* argv[]) {
         double avg_query_ns = (search_time_ms * 1'000'000.0) / static_cast<double>(NUM_QUERIES);
 
         std::printf("------------------------------------------------------------\n");
-        std::printf(" ¡á °Ë»ö °á°ú ¿ä¾à (Checksum: %lld)\n", checksum);
-        std::printf("   - Á¸ÀçÇÏ´Â Å° Ã£À½ (Hit) : %llu °Ç\n", hit_count);
-        std::printf("   - ¾ø´Â Å° °É·¯³¿ (Miss)  : %llu °Ç\n", miss_count);
-        std::printf(" ¡á ¼º´É ÃøÁ¤ °á°ú\n");
-        std::printf("   - ºôµå ¼Ò¿ä ½Ã°£         : %.3f ms\n", build_time_ms);
-        std::printf("   - ÀüÃ¼ °Ë»ö ¼Ò¿ä ½Ã°£    : %.3f ms (Äõ¸®´ç Æò±Õ %.2f ns)\n", search_time_ms, avg_query_ns);
-        std::printf("   - ¡Ú ÃÑ ÇÕ»ê ½Ã°£        : %.3f ms\n", build_time_ms + search_time_ms);
+        std::printf(" â–  ê²€ìƒ‰ ê²°ê³¼ ìš”ì•½ (Checksum: %lld)\n", checksum);
+        std::printf("   - ì¡´ì¬í•˜ëŠ” í‚¤ ì°¾ìŒ (Hit) : %llu ê±´\n", hit_count);
+        std::printf("   - ì—†ëŠ” í‚¤ ê±¸ëŸ¬ëƒ„ (Miss)  : %llu ê±´\n", miss_count);
+        std::printf(" â–  ì„±ëŠ¥ ì¸¡ì • ê²°ê³¼\n");
+        std::printf("   - ë¹Œë“œ ì†Œìš” ì‹œê°„         : %.3f ms\n", build_time_ms);
+        std::printf("   - ì „ì²´ ê²€ìƒ‰ ì†Œìš” ì‹œê°„    : %.3f ms (ì¿¼ë¦¬ë‹¹ í‰ê·  %.2f ns)\n", search_time_ms, avg_query_ns);
+        std::printf("   - â˜… ì´ í•©ì‚° ì‹œê°„        : %.3f ms\n", build_time_ms + search_time_ms);
         std::printf("------------------------------------------------------------\n\n");
     }
 
     // ========================================================================
-    // 5. »ç¿ëÀÚ·ÎºÎÅÍ Á÷Á¢ Á¤¼ö Å°¸¦ ÀÔ·Â¹Ş¾Æ À§Ä¡¸¦ Ãâ·ÂÇÏ´Â ·çÇÁ
+    // 5. ì‚¬ìš©ìë¡œë¶€í„° ì§ì ‘ ì •ìˆ˜ í‚¤ë¥¼ ì…ë ¥ë°›ì•„ ìœ„ì¹˜ë¥¼ ì¶œë ¥í•˜ëŠ” ë£¨í”„
     // ========================================================================
-    std::printf("[´ëÈ­Çü °Ë»ö ¸ğµå] Ã£À» Á¤¼ö Å° °ªÀ» ÀÔ·ÂÇÏ¼¼¿ä (Á¾·áÇÏ·Á¸é À½¼ö ¶Ç´Â q ÀÔ·Â):\n");
+    std::printf("[ëŒ€í™”í˜• ê²€ìƒ‰ ëª¨ë“œ] ì°¾ì„ ì •ìˆ˜ í‚¤ ê°’ì„ ì…ë ¥í•˜ì„¸ìš” (ì¢…ë£Œí•˜ë ¤ë©´ ìŒìˆ˜ ë˜ëŠ” q ì…ë ¥):\n");
     while (true) {
         std::cout << "\nQuery Key > ";
         std::string input;
         if (!(std::cin >> input) || input == "q" || input == "Q" || input[0] == '-') {
-            std::cout << "ÇÁ·Î±×·¥À» Á¾·áÇÕ´Ï´Ù.\n";
+            std::cout << "í”„ë¡œê·¸ë¨ì„ ì¢…ë£Œí•©ë‹ˆë‹¤.\n";
             break;
         }
 
@@ -355,7 +355,7 @@ int main(int argc, char* argv[]) {
             query_key = std::stoull(input);
         }
         catch (...) {
-            std::cout << "À¯È¿ÇÑ ¾çÀÇ Á¤¼ö¸¦ ÀÔ·ÂÇØ ÁÖ¼¼¿ä.\n";
+            std::cout << "ìœ íš¨í•œ ì–‘ì˜ ì •ìˆ˜ë¥¼ ì…ë ¥í•´ ì£¼ì„¸ìš”.\n";
             continue;
         }
 
@@ -365,11 +365,11 @@ int main(int argc, char* argv[]) {
         double elapsed_ns = std::chrono::duration<double, std::nano>(t1 - t0).count();
 
         if (result_pos != NOT_FOUND) {
-            std::printf(" -> [Á¸ÀçÇÔ] Å° %llu Àº(´Â) µ¥ÀÌÅÍ¼ÂÀÇ %lld ¹øÂ° À§Ä¡(Index)¿¡ Á¸ÀçÇÕ´Ï´Ù. (¼Ò¿ä½Ã°£: %.1f ns)\n",
+            std::printf(" -> [ì¡´ì¬í•¨] í‚¤ %llu ì€(ëŠ”) ë°ì´í„°ì…‹ì˜ %lld ë²ˆì§¸ ìœ„ì¹˜(Index)ì— ì¡´ì¬í•©ë‹ˆë‹¤. (ì†Œìš”ì‹œê°„: %.1f ns)\n",
                 query_key, result_pos, elapsed_ns);
         }
         else {
-            std::printf(" -> [¾øÀ½] Å° %llu Àº(´Â) µ¥ÀÌÅÍ¼Â¿¡ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù. (¼Ò¿ä½Ã°£: %.1f ns)\n",
+            std::printf(" -> [ì—†ìŒ] í‚¤ %llu ì€(ëŠ”) ë°ì´í„°ì…‹ì— ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤. (ì†Œìš”ì‹œê°„: %.1f ns)\n",
                 query_key, elapsed_ns);
         }
     }
