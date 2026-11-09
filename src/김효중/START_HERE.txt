@@ -1,0 +1,18 @@
+SOSD Team Benchmark - Quick start
+
+1. Open SOSD_Search.sln in Visual Studio 2022.
+2. Set configuration to Release / x64.
+3. Select Build > Rebuild Solution. Note build duration in seconds.
+4. Run with Ctrl+F5 and enter that duration.
+5. Enter the absolute path to the SOSD uint32 dataset.
+6. Enter search keys; press q to choose another dataset or exit.
+
+File layout:
+  SOSD_Search.sln
+  SOSD_Search.vcxproj
+  SOSD_Search.vcxproj.filters
+  README.md
+  .gitignore
+  src/main.cpp
+
+Note: Compiler build time is separately entered by the user.
