@@ -1,0 +1,13 @@
+.vs/
+**/x64/
+**/Debug/
+**/Release/
+*.vcxproj.user
+*.suo
+*.obj
+*.pdb
+*.exe
+*.log
+*.tlog
+uniform_dense_200M_uint32
+uniform_sparse_200M_uint32
