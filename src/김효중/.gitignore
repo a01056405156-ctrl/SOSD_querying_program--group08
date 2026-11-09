@@ -1,0 +1,21 @@
+# Visual Studio / compiler artifacts
+.vs/
+**/x64/
+**/Debug/
+**/Release/
+**/build/
+*.vcxproj.user
+*.suo
+*.VC.db
+*.VC.opendb
+*.vsidx
+*.obj
+*.pdb
+*.ilk
+*.exe
+*.tlog
+*.log
+*.ipch
+# SOSD datasets (do not commit ~800MB files)
+uniform_dense_200M_uint32
+uniform_sparse_200M_uint32
